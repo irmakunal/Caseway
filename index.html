@@ -1025,12 +1025,12 @@
     <li><a href="#how">How It Works</a></li>
     <li><a href="#features">Platform</a></li>
     <li><a href="#for-whom">For Physicians</a></li>
-    <li><a href="mailto:hello@caseway.io">Contact</a></li>
+    <li><a href="/cdn-cgi/l/email-protection#83ebe6efefecc3e0e2f0e6f4e2faadeaec">Contact</a></li>
   </ul>
   <span class="footer-copy">© 2025 Caseway</span>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -1046,16 +1046,23 @@
     observer.observe(el);
   });
 
-  // Waitlist form
-  function handleSubmit(e, successId) {
+  // Waitlist form — posts to Tally
+  async function handleSubmit(e, successId) {
     e.preventDefault();
     const form = e.target;
     const email = form.querySelector('input[type="email"]').value;
+    const btn = form.querySelector('button');
+    btn.textContent = '...';
+    btn.disabled = true;
 
-    // Store in localStorage for now; swap for Airtable/Tally later
-    const waitlist = JSON.parse(localStorage.getItem('caseway_waitlist') || '[]');
-    waitlist.push({ email, date: new Date().toISOString() });
-    localStorage.setItem('caseway_waitlist', JSON.stringify(waitlist));
+    try {
+      await fetch('https://tally.so/r/b5rWx2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ email }),
+        mode: 'no-cors'
+      });
+    } catch (_) {}
 
     form.style.display = 'none';
     document.getElementById(successId).classList.add('show');
@@ -1065,11 +1072,3 @@
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('nav');
     if (window.scrollY > 20) {
-      nav.style.boxShadow = '0 1px 12px rgba(0,0,0,0.06)';
-    } else {
-      nav.style.boxShadow = 'none';
-    }
-  });
-</script>
-</body>
-</html>
